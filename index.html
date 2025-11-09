@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ravintolalistaus</title>
+    <link rel="stylesheet" href="static/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="static/script.js" defer></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <header>
+        <div class="brand">
+          <div class="logo">RL</div>
+          <div>
+            <h2>Ravintolalistaus</h2>
+          </div>
+        </div>
+
+        <div class="search">
+          <input type="text" placeholder="Etsi ravintoloita..." />
+          <span>🔍</span>
+        </div>
+
+        <div>
+          <button class="chip active">Etusivu</button>
+          <button class="chip">Kirjaudu</button>
+          <button class="chip">Rekisteröidy</button>
+        </div>
+      </header>
+
+      <main class="main">
+        <h3>Ravintolat</h3>
+        <section class="filters">
+          <label
+            >Kaupunki:
+            <select>
+              <option>Kaikki</option>
+              <option>Helsinki</option>
+              <option>Espoo</option>
+              <option>Vantaa</option>
+            </select>
+          </label>
+
+          <label
+            >Palveluntarjoaja:
+            <select>
+              <option>Kaikki</option>
+              <option>Sodexo</option>
+              <option>Compass Group</option>
+              <option>Amica</option>
+            </select>
+          </label>
+
+          <button class="btn">Suodata</button>
+        </section>
+
+        <div class="menu-grid">
+          <div class="card">
+            <h3>Ravintola A</h3>
+            <p>Helsinki — Amica</p>
+            <div class="price">Avoinna: 10:30–14:00</div>
+
+            <h4>Päivän ruokalista</h4>
+            <ul>
+              <li>Kana-pastavuoka — €8.50</li>
+              <li>Kasviskeitto ja leipä — €7.00</li>
+              <li>Jälkiruoka: Marjarahka — €3.00</li>
+            </ul>
+
+            <button class="btn">Näytä viikon lista</button>
+            <button class="btn">⭐ Lisää suosikiksi</button>
+          </div>
+
+          <div class="card">
+            <h3>Ravintola B</h3>
+            <p>Espoo — Sodexo</p>
+            <div class="price">Avoinna: 11:00–14:30</div>
+
+            <h4>Päivän ruokalista</h4>
+            <ul>
+              <li>Lohikeitto ja ruisleipä — €8.00</li>
+              <li>Kasvislasagne — €8.50</li>
+              <li>Pannukakku ja hillo — €3.00</li>
+            </ul>
+
+            <button class="btn">Näytä viikon lista</button>
+            <button class="btn">Lisää suosikiksi</button>
+          </div>
+
+          <div class="card">
+            <h3>Ravintola C</h3>
+            <p>Vantaa — Compass Group</p>
+            <div class="price">Avoinna: 10:45–13:45</div>
+
+            <h4>Päivän ruokalista</h4>
+            <ul>
+              <li>Lihapullat ja muusi — €9.50</li>
+              <li>Kasviscurry ja riisi — €8.00</li>
+              <li>Omenapiirakka ja vaniljakastike — €3.50</li>
+            </ul>
+
+            <button class="btn">Näytä viikon lista</button>
+            <button class="btn">Lisää suosikiksi</button>
+          </div>
+        </div>
+      </main>
+
+      <aside class="sidebar">
+        <h4>Kartta</h4>
+        <div id="map"></div>
+      </aside>
+    </div>
+  </body>
+</html>
