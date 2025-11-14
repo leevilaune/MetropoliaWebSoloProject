@@ -19,6 +19,8 @@ const map = L.map("map").setView(
 );
 
 let USER_TOKEN = "";
+let MAP_LOADED = false;
+let userData = {};
 
 L.tileLayer("https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png", {
   maxZoom: 19,
@@ -81,61 +83,130 @@ async function getData(url) {
 }
 
 function openRegisterWindow() {
-  const registerModal = document.getElementsByTagName("dialog")[0];
-  const registerForm = registerModal.getElementsByTagName("form")[0];
+  const dialog = document.getElementsByTagName("dialog")[0];
+  dialog.innerHTML = "";
 
-  const registerButton = document.getElementById("confirm-register");
+  const heading = document.createElement("h4");
+  heading.textContent = "Kirjaudu";
+  dialog.appendChild(heading);
 
-  const errorTextHolder =
-    registerModal.getElementsByClassName("error-text-holder")[0];
+  const form = document.createElement("form");
+  form.action = "https://media2.edu.metropolia.fi/restaurant/api/v1/users";
+  form.method = "POST";
 
-  registerButton.addEventListener("click", async (event) => {
-    const username = registerForm.elements["username"].value;
-    const password = registerForm.elements["password"].value;
-    const email = registerForm.elements["email"].value;
+  const usernameInput = document.createElement("input");
+  usernameInput.type = "text";
+  usernameInput.name = "username";
+  usernameInput.placeholder = "Username";
+  usernameInput.required = true;
+  form.appendChild(usernameInput);
+
+  const emailInput = document.createElement("input");
+  emailInput.type = "text";
+  emailInput.name = "email";
+  emailInput.placeholder = "email";
+  emailInput.required = true;
+  form.appendChild(emailInput);
+
+  const passwordInput = document.createElement("input");
+  passwordInput.type = "password";
+  passwordInput.name = "password";
+  passwordInput.placeholder = "Password";
+  passwordInput.required = true;
+  form.appendChild(passwordInput);
+
+  const submitButton = document.createElement("button");
+  submitButton.type = "submit";
+  submitButton.id = "confirm-login";
+  submitButton.textContent = "Kirjaudu";
+  form.appendChild(submitButton);
+
+  const errorHolder = document.createElement("div");
+  errorHolder.className = "error-text-holder";
+  form.appendChild(errorHolder);
+
+  dialog.appendChild(form);
+
+  submitButton.addEventListener("click", async (event) => {
     event.preventDefault();
+
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+    const email = emailInput.value;
     const user = {
       username: username,
       password: password,
       email: email,
     };
-    const response = await postData(registerForm.action, user);
+    const response = await postData(form.action, user);
     const result = document.createElement("p");
-    errorTextHolder.innerHTML = "";
+    errorHolder.innerHTML = "";
     console.log(response);
     result.textContent = response.message;
-    errorTextHolder.appendChild(result);
+    errorHolder.appendChild(result);
   });
-  registerModal.showModal();
+  dialog.showModal();
 }
 
 function openLoginWindow() {
-  const loginModal = document.getElementById("login");
-  const loginForm = loginModal.getElementsByTagName("form")[0];
-  const loginButton = document.getElementById("confirm-login");
-  const errorTextHolder =
-    loginModal.getElementsByClassName("error-text-holder")[0];
+  const dialog = document.getElementsByTagName("dialog")[0];
+  dialog.innerHTML = "";
 
-  loginButton.addEventListener("click", async (event) => {
+  const heading = document.createElement("h4");
+  heading.textContent = "Kirjaudu";
+  dialog.appendChild(heading);
+
+  const form = document.createElement("form");
+  form.action = "https://media2.edu.metropolia.fi/restaurant/api/v1/auth/login";
+  form.method = "POST";
+
+  const usernameInput = document.createElement("input");
+  usernameInput.type = "text";
+  usernameInput.name = "username";
+  usernameInput.placeholder = "Username";
+  usernameInput.required = true;
+  form.appendChild(usernameInput);
+
+  const passwordInput = document.createElement("input");
+  passwordInput.type = "password";
+  passwordInput.name = "password";
+  passwordInput.placeholder = "Password";
+  passwordInput.required = true;
+  form.appendChild(passwordInput);
+
+  const submitButton = document.createElement("button");
+  submitButton.type = "submit";
+  submitButton.id = "confirm-login";
+  submitButton.textContent = "Kirjaudu";
+  form.appendChild(submitButton);
+
+  const errorHolder = document.createElement("div");
+  errorHolder.className = "error-text-holder";
+  form.appendChild(errorHolder);
+
+  dialog.appendChild(form);
+  submitButton.addEventListener("click", async (event) => {
     event.preventDefault();
 
-    const username = loginForm.elements["username"].value;
-    const email = loginForm.elements["password"].value;
+    const username = usernameInput.value;
+    const password = passwordInput.value;
     const user = {
       username: username,
-      password: email,
+      password: password,
     };
-    const response = await postData(loginForm.action, user);
+    const response = await postData(form.action, user);
     const result = document.createElement("p");
-    errorTextHolder.innerHTML = "";
+    errorHolder.innerHTML = "";
     result.textContent = response.message;
-    errorTextHolder.appendChild(result);
+    errorHolder.appendChild(result);
     if (!response.error) {
       USER_TOKEN = response.token;
+      userData = { ...response.data };
+      console.log(userData);
       console.log(USER_TOKEN);
     }
   });
-  loginModal.showModal();
+  dialog.showModal();
 }
 
 function loadFilters(filters) {
@@ -206,29 +277,33 @@ async function loadRestaurants(filters) {
     cities.add(element.city);
     providers.add(element.company);
     menuGrid.appendChild(generateRestaurantCard(element));
-    console.log(element);
-    var marker = L.marker([
-      element.location.coordinates[1],
-      element.location.coordinates[0],
-    ]).addTo(map);
-    marker.bindPopup(element.name);
+    if (!MAP_LOADED) {
+      var marker = L.marker([
+        element.location.coordinates[1],
+        element.location.coordinates[0],
+      ]).addTo(map);
+      marker.bindPopup(element.name);
+    }
   });
-  const redIcon = L.icon({
-    iconUrl:
-      "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
-    shadowUrl:
-      "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-    iconSize: [25, 41],
-    shadowSize: [41, 41],
-  });
+  if (!MAP_LOADED) {
+    const redIcon = L.icon({
+      iconUrl:
+        "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+      shadowUrl:
+        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+      iconSize: [25, 41],
+      shadowSize: [41, 41],
+    });
 
-  const youMarker = L.marker(
-    [reference.location.coordinates[1], reference.location.coordinates[0]],
-    { icon: redIcon }
-  )
-    .addTo(map)
-    .bindPopup("You");
+    const youMarker = L.marker(
+      [reference.location.coordinates[1], reference.location.coordinates[0]],
+      { icon: redIcon }
+    )
+      .addTo(map)
+      .bindPopup("You");
+  }
   loadFilters({ city: cities, provider: providers });
+  MAP_LOADED = true;
   console.log(cities);
   console.log(providers);
 }

@@ -35,7 +35,6 @@
         </div>
 
         <div>
-          <button class="chip active">Etusivu</button>
           <button class="chip" onclick="openLoginWindow()">Kirjaudu</button>
           <button class="chip" onclick="openRegisterWindow()">
             Rekisteröidy
@@ -67,23 +66,6 @@
         <div id="map"></div>
       </aside>
       <dialog>
-        <h4>Rekisteröidy</h4>
-        <form
-          action="https://media2.edu.metropolia.fi/restaurant/api/v1/users"
-          method="POST"
-        >
-          <input type="text" name="username" placeholder="Username" required />
-          <input type="text" name="email" placeholder="email" required />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            required
-          />
-
-          <button type="submit" id="confirm-register">Rekisteröidy</button>
-          <div class="error-text-holder"></div>
-        </form>
       </dialog>
       <dialog id="login">
         <h4>Kirjaudu</h4>
