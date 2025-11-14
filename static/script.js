@@ -72,6 +72,18 @@ async function postDataWithToken(url, data) {
   return validateResponse(response);
 }
 
+async function putDataWithToken(url, data) {
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${USER_TOKEN}`,
+    },
+    body: JSON.stringify(data),
+  });
+  return validateResponse(response);
+}
+
 async function getData(url) {
   const response = await fetch(url, {
     method: "GET",
@@ -80,6 +92,54 @@ async function getData(url) {
     },
   });
   return validateResponse(response);
+}
+
+function swapToLoggedInButtons() {
+  const buttons = document.getElementById("top-corner-buttons");
+  buttons.innerHTML = "";
+
+  const dropdown = document.createElement("div");
+  dropdown.classList.add("dropdown");
+
+  const userButton = document.createElement("button");
+  userButton.textContent = userData.username;
+  userButton.classList.add("chip", "active");
+  dropdown.appendChild(userButton);
+
+  const menu = document.createElement("div");
+  menu.classList.add("dropdown-menu");
+  menu.style.display = "none";
+
+  const profileItem = document.createElement("div");
+  profileItem.textContent = "Profile";
+  profileItem.classList.add("dropdown-item");
+  menu.appendChild(profileItem);
+
+  const settingsItem = document.createElement("div");
+  settingsItem.textContent = "Settings";
+  settingsItem.classList.add("dropdown-item");
+  menu.appendChild(settingsItem);
+
+  const logoutItem = document.createElement("div");
+  logoutItem.textContent = "Logout";
+  logoutItem.classList.add("dropdown-item");
+  logoutItem.addEventListener("click", () => {
+    console.log("Logging out...");
+  });
+  menu.appendChild(logoutItem);
+
+  dropdown.appendChild(menu);
+  buttons.appendChild(dropdown);
+
+  userButton.addEventListener("click", () => {
+    menu.style.display = menu.style.display === "none" ? "block" : "none";
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!dropdown.contains(e.target)) {
+      menu.style.display = "none";
+    }
+  });
 }
 
 function openRegisterWindow() {
@@ -204,6 +264,8 @@ function openLoginWindow() {
       userData = { ...response.data };
       console.log(userData);
       console.log(USER_TOKEN);
+      swapToLoggedInButtons();
+      dialog.close();
     }
   });
   dialog.showModal();
@@ -270,6 +332,8 @@ async function loadRestaurants(filters) {
     (a, b) => eucleanDist(reference, a) - eucleanDist(reference, b)
   );
 
+  restaurants[0] = {...restaurants[0], closest: true};
+
   console.log(filteredRestaurants);
   const cities = new Set().add("Kaikki");
   const providers = new Set().add("Kaikki");
@@ -311,6 +375,12 @@ async function loadRestaurants(filters) {
 function generateRestaurantCard(restaurant) {
   const card = document.createElement("div");
   card.className = "card";
+  if(restaurant.closest){
+    card.classList.add("closest");
+    const closestText = document.createElement("p");
+    closestText.textContent = "Lähin";
+    card.appendChild(closestText);
+  }
 
   const title = document.createElement("h3");
   title.textContent = restaurant.name;
@@ -322,14 +392,6 @@ function generateRestaurantCard(restaurant) {
 
   const hours = document.createElement("div");
   hours.className = "price";
-
-  //const menuList = document.createElement("ul");
-  //restaurant.menu.forEach((item) => {
-  //  const li = document.createElement("li");
-  //  li.textContent = `${item.name} — €${item.price.toFixed(2)}`;
-  //  menuList.appendChild(li);
-  //});
-  //card.appendChild(menuList);
 
   const showDayBtn = document.createElement("button");
   showDayBtn.className = "btn";
@@ -344,6 +406,18 @@ function generateRestaurantCard(restaurant) {
   const favoriteBtn = document.createElement("button");
   favoriteBtn.className = "btn";
   favoriteBtn.textContent = "Lisää suosikiksi";
+  favoriteBtn.addEventListener("click", async (event) => {
+    const data = {
+      favouriteRestaurant: restaurant._id,
+    };
+    console.log(data);
+    const resp = await putDataWithToken(
+      "https://media2.edu.metropolia.fi/restaurant/api/v1/users",
+      data
+    );
+    userData = { ...resp.data };
+    console.log(userData);
+  });
   card.appendChild(favoriteBtn);
 
   return card;

@@ -119,6 +119,12 @@ header p {
   color: #94a3b8;
   font-size: 13px;
 }
+.closest {
+  background: #8a3939;
+  border-radius: 10px;
+  padding: 10px;
+  padding-top: 0;
+}
 .price {
   margin-top: 8px;
   font-weight: 700;
@@ -259,4 +265,35 @@ dialog p {
   font-size: 14px;
   margin-bottom: 12px;
   line-height: 1.5;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #1e293b;
+  color: #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  min-width: 140px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #f1f5f9;
+}
+
+.dropdown-item:hover {
+  background-color: #ff6b6b;
+  color: white;
 }
