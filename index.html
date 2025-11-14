@@ -36,8 +36,10 @@
 
         <div>
           <button class="chip active">Etusivu</button>
-          <button class="chip">Kirjaudu</button>
-          <button class="chip">Rekisteröidy</button>
+          <button class="chip" onclick="openLoginWindow()">Kirjaudu</button>
+          <button class="chip" onclick="openRegisterWindow()">
+            Rekisteröidy
+          </button>
         </div>
       </header>
 
@@ -46,82 +48,60 @@
         <section class="filters">
           <label
             >Kaupunki:
-            <select>
-              <option>Kaikki</option>
-              <option>Helsinki</option>
-              <option>Espoo</option>
-              <option>Vantaa</option>
-            </select>
+            <select class="city-filter"></select>
           </label>
 
           <label
             >Palveluntarjoaja:
-            <select>
-              <option>Kaikki</option>
-              <option>Sodexo</option>
-              <option>Compass Group</option>
-              <option>Amica</option>
-            </select>
+            <select class="provider-filter"></select>
           </label>
 
-          <button class="btn">Suodata</button>
+          <button class="btn" onclick="filterRestaurants()">Suodata</button>
         </section>
 
-        <div class="menu-grid">
-          <div class="card">
-            <h3>Ravintola A</h3>
-            <p>Helsinki — Amica</p>
-            <div class="price">Avoinna: 10:30–14:00</div>
-
-            <h4>Päivän ruokalista</h4>
-            <ul>
-              <li>Kana-pastavuoka — €8.50</li>
-              <li>Kasviskeitto ja leipä — €7.00</li>
-              <li>Jälkiruoka: Marjarahka — €3.00</li>
-            </ul>
-
-            <button class="btn">Näytä viikon lista</button>
-            <button class="btn">⭐ Lisää suosikiksi</button>
-          </div>
-
-          <div class="card">
-            <h3>Ravintola B</h3>
-            <p>Espoo — Sodexo</p>
-            <div class="price">Avoinna: 11:00–14:30</div>
-
-            <h4>Päivän ruokalista</h4>
-            <ul>
-              <li>Lohikeitto ja ruisleipä — €8.00</li>
-              <li>Kasvislasagne — €8.50</li>
-              <li>Pannukakku ja hillo — €3.00</li>
-            </ul>
-
-            <button class="btn">Näytä viikon lista</button>
-            <button class="btn">Lisää suosikiksi</button>
-          </div>
-
-          <div class="card">
-            <h3>Ravintola C</h3>
-            <p>Vantaa — Compass Group</p>
-            <div class="price">Avoinna: 10:45–13:45</div>
-
-            <h4>Päivän ruokalista</h4>
-            <ul>
-              <li>Lihapullat ja muusi — €9.50</li>
-              <li>Kasviscurry ja riisi — €8.00</li>
-              <li>Omenapiirakka ja vaniljakastike — €3.50</li>
-            </ul>
-
-            <button class="btn">Näytä viikon lista</button>
-            <button class="btn">Lisää suosikiksi</button>
-          </div>
-        </div>
+        <div class="menu-grid"></div>
       </main>
 
       <aside class="sidebar">
         <h4>Kartta</h4>
         <div id="map"></div>
       </aside>
+      <dialog>
+        <h4>Rekisteröidy</h4>
+        <form
+          action="https://media2.edu.metropolia.fi/restaurant/api/v1/users"
+          method="POST"
+        >
+          <input type="text" name="username" placeholder="Username" required />
+          <input type="text" name="email" placeholder="email" required />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+          />
+
+          <button type="submit" id="confirm-register">Rekisteröidy</button>
+          <div class="error-text-holder"></div>
+        </form>
+      </dialog>
+      <dialog id="login">
+        <h4>Kirjaudu</h4>
+        <form
+          action="https://media2.edu.metropolia.fi/restaurant/api/v1/auth/login"
+          method="POST"
+        >
+          <input type="text" name="username" placeholder="Username" required />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+          />
+          <button type="submit" id="confirm-login">Kirjaudu</button>
+          <div class="error-text-holder"></div>
+        </form>
+      </dialog>
     </div>
   </body>
 </html>

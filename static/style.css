@@ -189,3 +189,74 @@ select:hover {
   font-size: 14px;
   color: #cbd5e1;
 }
+
+dialog {
+  background: #1e293b;
+  backdrop-filter: blur(25px);
+  color: #f1f5f9;
+  border: none;
+  border-radius: 10px;
+  padding: 20px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  font-family: Inter, sans-serif;
+}
+dialog h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 20px;
+}
+
+dialog p {
+  font-size: 14px;
+  color: #94a3b8;
+  margin-bottom: 16px;
+}
+
+dialog img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+dialog button {
+  width: 100%;
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 0;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+dialog button:hover {
+  background: #cc5555;
+}
+
+dialog button:active {
+  background: #b24a4a;
+}
+dialog input {
+  width: 100%;
+  background: #1e293b;
+  color: #f1f5f9;
+  border: 1px solid #94a3b8;
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+dialog input:focus {
+  border-color: #ff6b6b;
+}
+
+dialog p {
+  color: #94a3b8;
+  font-size: 14px;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
