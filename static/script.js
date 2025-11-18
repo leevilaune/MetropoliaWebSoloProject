@@ -18,7 +18,7 @@ const map = L.map("map").setView(
   13
 );
 
-let USER_TOKEN = "";
+let USER_TOKEN = undefined;
 let MAP_LOADED = false;
 let userData = {};
 
@@ -94,7 +94,7 @@ async function getData(url) {
   return validateResponse(response);
 }
 
-function swapToLoggedInButtons() {
+function swapToLoggedInButtons(filters) {
   const buttons = document.getElementById("top-corner-buttons");
   buttons.innerHTML = "";
 
@@ -140,6 +140,7 @@ function swapToLoggedInButtons() {
       menu.style.display = "none";
     }
   });
+  loadRestaurants(filters);
 }
 
 function openRegisterWindow() {
@@ -332,7 +333,7 @@ async function loadRestaurants(filters) {
     (a, b) => eucleanDist(reference, a) - eucleanDist(reference, b)
   );
 
-  restaurants[0] = {...restaurants[0], closest: true};
+  restaurants[0] = { ...restaurants[0], closest: true };
 
   console.log(filteredRestaurants);
   const cities = new Set().add("Kaikki");
@@ -375,7 +376,7 @@ async function loadRestaurants(filters) {
 function generateRestaurantCard(restaurant) {
   const card = document.createElement("div");
   card.className = "card";
-  if(restaurant.closest){
+  if (restaurant.closest) {
     card.classList.add("closest");
     const closestText = document.createElement("p");
     closestText.textContent = "Lähin";
@@ -396,17 +397,40 @@ function generateRestaurantCard(restaurant) {
   const showDayBtn = document.createElement("button");
   showDayBtn.className = "btn";
   showDayBtn.textContent = "Näytä päivän lista";
+  showDayBtn.addEventListener("click", async (event) => {
+    const data = await getData(
+      `https://media2.edu.metropolia.fi/restaurant/api/v1/restaurants/daily/${restaurant._id}/fi`
+    );
+    console.log(data);
+    showDailyMenu(data);
+  });
   card.appendChild(showDayBtn);
 
   const showWeekBtn = document.createElement("button");
   showWeekBtn.className = "btn";
   showWeekBtn.textContent = "Näytä viikon lista";
+  showWeekBtn.addEventListener("click", async (event) => {
+    const data = await getData(
+      `https://media2.edu.metropolia.fi/restaurant/api/v1/restaurants/weekly/${restaurant._id}/fi`
+    );
+    console.log(data);
+    showWeeklyMenu(data);
+  });
   card.appendChild(showWeekBtn);
 
   const favoriteBtn = document.createElement("button");
   favoriteBtn.className = "btn";
-  favoriteBtn.textContent = "Lisää suosikiksi";
+  if (restaurant._id == userData.favouriteRestaurant) {
+    favoriteBtn.textContent = "Suosikki";
+  } else {
+    favoriteBtn.textContent = "Lisää suosikiksi";
+  }
   favoriteBtn.addEventListener("click", async (event) => {
+    if (favoriteBtn.textContent != "Suosikki" && USER_TOKEN) {
+      favoriteBtn.textContent = "Suosikki";
+    } else {
+      favoriteBtn.textContent = "Lisää suosikiksi";
+    }
     const data = {
       favouriteRestaurant: restaurant._id,
     };
@@ -444,6 +468,117 @@ function filterRestaurants() {
         ? search.value.toLowerCase()
         : undefined,
   });
+}
+
+function showWeeklyMenu(data) {
+  const dialog = document.getElementsByTagName("dialog")[0];
+  dialog.innerHTML = "";
+
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "✕";
+  closeBtn.classList.add("dialog-close-btn");
+  closeBtn.addEventListener("click", () => dialog.close());
+  dialog.appendChild(closeBtn);
+
+  if (!data || data.days.length == 0) {
+    const noData = document.createElement("p");
+    noData.textContent = "Viikon ruokalistaa ei löydy";
+    dialog.append(noData);
+    dialog.showModal();
+    return;
+  }
+
+  const heading = document.createElement("h4");
+  heading.textContent = "Viikon lista";
+  dialog.appendChild(heading);
+
+  data.days.forEach((day) => {
+    const dayDiv = document.createElement("p");
+    dayDiv.classList.add("menu-day");
+
+    const dayTitle = document.createElement("p");
+    dayTitle.classList.add("menu-day-title");
+    dayTitle.textContent = day.date;
+    dayDiv.appendChild(dayTitle);
+
+    day.courses.forEach((course) => {
+      const courseDiv = document.createElement("p");
+      courseDiv.classList.add("menu-course");
+
+      const name = document.createElement("p");
+      name.classList.add("menu-course-name");
+      name.textContent = course.name;
+
+      const details = document.createElement("p");
+      details.classList.add("menu-course-details");
+      details.textContent = `Price: ${course.price || "N/A"} | Diets: ${
+        course.diets || "N/A"
+      }`;
+
+      courseDiv.appendChild(name);
+      courseDiv.appendChild(details);
+      dayDiv.appendChild(courseDiv);
+    });
+
+    dialog.appendChild(dayDiv);
+  });
+
+  dialog.showModal();
+}
+
+function showDailyMenu(data) {
+  const dialog = document.getElementsByTagName("dialog")[0];
+  dialog.innerHTML = "";
+
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "✕";
+  closeBtn.classList.add("dialog-close-btn");
+  closeBtn.addEventListener("click", () => dialog.close());
+  dialog.appendChild(closeBtn);
+
+  if (!data || data.courses.length == 0) {
+    const noData = document.createElement("p");
+    noData.textContent = "Päivän ruokalistaa ei löydy";
+    dialog.append(noData);
+    dialog.showModal();
+
+    return;
+  }
+
+  const heading = document.createElement("h4");
+  heading.textContent = "Tänään";
+  dialog.appendChild(heading);
+
+  const today = data;
+  const dayDiv = document.createElement("p");
+  dayDiv.classList.add("menu-day");
+
+  const dayTitle = document.createElement("p");
+  dayTitle.classList.add("menu-day-title");
+  dayTitle.textContent = today.date;
+  dayDiv.appendChild(dayTitle);
+
+  today.courses.forEach((course) => {
+    const courseDiv = document.createElement("p");
+    courseDiv.classList.add("menu-course");
+
+    const name = document.createElement("p");
+    name.classList.add("menu-course-name");
+    name.textContent = course.name;
+
+    const details = document.createElement("p");
+    details.classList.add("menu-course-details");
+    details.textContent = `Price: ${course.price || "N/A"} | Diets: ${
+      course.diets || "N/A"
+    }`;
+
+    courseDiv.appendChild(name);
+    courseDiv.appendChild(details);
+    dayDiv.appendChild(courseDiv);
+  });
+
+  dialog.appendChild(dayDiv);
+  dialog.showModal();
 }
 
 loadRestaurants();
